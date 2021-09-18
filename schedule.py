@@ -6,7 +6,7 @@ BLOCKS_PER_HOUR = 4
 
 class Schedule:
 
-    def __init__(self, start_date, end_date):
+    def __init__(self, schedule_start_date, schedule_end_date):
         '''
         Initialize a Schedule object
         
@@ -14,7 +14,7 @@ class Schedule:
         * start_date (datetime obj): the starting date for the schedule
         * end_date (datetime obj): the ending date for the schedule
         '''
-        self.days = self.generate_blank_schedule(start_date, end_date)
+        self.days = self.generate_blank_schedule(schedule_start_date, schedule_end_date)
         self.tasks = []
 
     def generate_blank_schedule(self, start_date, end_date):
@@ -150,7 +150,7 @@ class Day:
                 block += 1
 
 class Task:
-    def __init__(self, name, priority, duration, difficulty=0, start_date=None, due_date=None):
+    def __init__(self, name, priority, duration, difficulty=0, start_date = None, due_date=None):
         '''
         Initializes a Task object
 
@@ -159,7 +159,7 @@ class Task:
         * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
         * duration (int): estimated time to complete task in minutes
         * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
-        * start_date (datetime obj): start date of task
+        * start_date (datetime obj): first day on which task can be completed
         * due_date (datetime obj): last day on which task can be completed
         '''
         self.name = name
@@ -168,6 +168,24 @@ class Task:
         self.start_date = start_date
         self.due_date = due_date
         self.duration = duration
+
+class Event:
+    def __init__(self, name, priority, difficulty=0, start_time=None, end_time=None):
+        '''
+        Initializes a Event object
+
+        Inputs:
+        * name (str): name of task
+        * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
+        * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
+        * start_time (datetime obj): start date of task
+        * end_time (datetime obj): last day on which task can be completed
+        '''
+        self.name = name
+        self.priority = priority
+        self.difficulty = difficulty
+        self.start_time = start_time
+        self.end_time = end_time
 
 sleep_start = datetime.time(0,0,0)
 sleep_end = datetime.time(7,30,0)
