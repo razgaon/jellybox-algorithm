@@ -309,49 +309,51 @@ class Event:
         self.start_time = start_time
         self.end_time = end_time
 
-preferences = [{
-    'energy_levels' : [3,3,3,3,3,3],
-    'sleep_start': datetime.time(0,0,0),
-    'sleep_end': datetime.time(7,30,0),
-}]
 
-events = [
-    {
-        'name' : "pset", 
-        'priority' : 1, 
-        'difficulty' : 3, 
-        'date': datetime.date(2020, 1, 4),
-        'start_time' : datetime.time(8,0,0), 
-        'end_time' : datetime.time(11,0,0)
-    }
-]
+if __name__ == "__main__":
+    preferences = [{
+        'energy_levels' : [3,3,3,3,3,3],
+        'sleep_start': datetime.time(0,0,0),
+        'sleep_end': datetime.time(7,30,0),
+    }]
 
-tasks = [
-    {
-        'name' : "pset", 
-        'chunks': False,
-        'priority' : 1, 
-        'difficulty' : 3, 
-        'duration': 180,
-        'start_date' : datetime.date(2020, 1, 4), 
-        'end_date' : datetime.date(2020, 1, 6)
-    },
-    {
-        'name' : "hw", 
-        'chunks': True,
-        'priority' : 5, 
-        'difficulty' : 4, 
-        'duration': 180,
-        'start_date' : datetime.date(2020, 1, 4), 
-        'end_date' : datetime.date(2020, 1, 6)
-    }
-]
+    events = [
+        {
+            'name' : "pset", 
+            'priority' : 1, 
+            'difficulty' : 3, 
+            'date': datetime.date(2020, 1, 4),
+            'start_time' : datetime.time(8,0,0), 
+            'end_time' : datetime.time(11,0,0)
+        }
+    ]
 
-start_date = datetime.date(2020, 1, 3)
-end_date = datetime.date(2020, 1, 7)
-test_schedule = Schedule(start_date, end_date, preferences, events, tasks)
-print('hi')
-test_schedule.account_sleep()
-test_task = Task('testing', True, 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
-test_schedule.add_task(test_task)
-test_schedule.display_schedule()
+    tasks = [
+        {
+            'name' : "pset", 
+            'chunks': False,
+            'priority' : 1, 
+            'difficulty' : 3, 
+            'duration': 180,
+            'start_date' : datetime.date(2020, 1, 4), 
+            'end_date' : datetime.date(2020, 1, 6)
+        },
+        {
+            'name' : "hw", 
+            'chunks': True,
+            'priority' : 5, 
+            'difficulty' : 4, 
+            'duration': 180,
+            'start_date' : datetime.date(2020, 1, 4), 
+            'end_date' : datetime.date(2020, 1, 6)
+        }
+    ]
+
+    start_date = datetime.date(2020, 1, 3)
+    end_date = datetime.date(2020, 1, 7)
+    test_schedule = Schedule(start_date, end_date, preferences, events, tasks)
+    print('hi')
+    test_schedule.account_sleep()
+    test_task = Task('testing', True, 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
+    test_schedule.add_task(test_task)
+    test_schedule.display_schedule()
