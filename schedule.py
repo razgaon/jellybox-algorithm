@@ -84,6 +84,20 @@ class Schedule:
         self.tasks = []
         for task in tasks:
             self.tasks.append(task[0])
+    
+    def sort_events(self):
+        '''
+        Sort events by formula
+        '''
+        events = []
+        for event in self.events:
+            num = .6 * event.priority + .4 * event.difficulty
+            tasks.append((event, num))
+        event.sort(key=lambda x:x[1])
+        
+        self.events = []
+        for event in events:
+            self.events.append(event[0])
 
     def add_task(self, task, hasSorted = False):
         '''
