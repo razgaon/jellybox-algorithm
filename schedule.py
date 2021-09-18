@@ -3,6 +3,8 @@ from preferences import *
 HOURS_PER_DAY = 24
 MINUTES_PER_HOUR = 60
 BLOCKS_PER_HOUR = 4
+MINUTES_PER_BLOCK = 60
+BLOCK_LENGTH = 15
 
 class Schedule:
 
@@ -30,29 +32,41 @@ class Schedule:
         '''
         delta = datetime.timedelta(days = 1)
         days = {}
-        while start_date <= end_date:
-            days[start_date] = Day()
-            start_date += delta
+        curr_date = start_date
+        while curr_date <= end_date:
+            days[curr_date] = Day(curr_date)
+            curr_date += delta
         return days
 
-    def add_task(self, task):
+    def add_task(self, task, chunks = True):
         '''
         Add a task into the schedule
         
         Input:
         * task (Task obj): task information
         '''
+        block_size = MINUTES_PER_BLOCK if chunks else task.duration
         self.tasks.append(task)
+        remaining_duration = task.duration
         for day, day_schedule in self.days.items():
             if day < task.start_date:
                 continue
             if day > task.due_date:
                 break
-            is_time_available, start_time = day_schedule.find_time_for_task(task)
+            
+            while remaining_duration > 0:
+                curr_duration = block_size if remaining_duration >= block_size else remaining_duration
+                is_time_available, start_time = day_schedule.find_time_for_task(curr_duration)
 
-            if is_time_available:
-                hour, block = start_time
-                day_schedule.schedule_task(task, hour, block)
+                if not is_time_available:
+                    break 
+
+                if is_time_available:
+                    remaining_duration -= curr_duration
+                    hour, block = start_time
+                    day_schedule.schedule_task(task, hour, block, curr_duration)
+
+            if remaining_duration == 0:
                 return
     
     def account_sleep(self, energy_preferences):
@@ -66,7 +80,7 @@ class Schedule:
         for time, block_energy in enumerate(energy_preferences):
             if block_energy == 0:
                 for day_schedule in self.days.values():
-                    day_schedule.schedule_task(task, time, 0)
+                    day_schedule.schedule_task(task, time, 0, task.duration)
 
     def display_schedule(self):
         '''
@@ -76,10 +90,14 @@ class Schedule:
             print(day_schedule.times)
 
 class Day:
-    def __init__(self):
+    def __init__(self, date):
         '''
         Initialize a Day object
+
+        Inputs:
+        * date (date obj): date that object represents
         '''
+        self.date = date
         self.times = [[None] * BLOCKS_PER_HOUR for _ in range(HOURS_PER_DAY)]
 
     def get_open_times(self):
@@ -99,7 +117,7 @@ class Day:
                     open_times[i].add(j)
         return open_times
 
-    def find_time_for_task(self, task):
+    def find_time_for_task(self, duration):
         '''
         Finds first time block in which task can be scheduled
 
@@ -117,7 +135,7 @@ class Day:
         restart_time = False
         for i, hour in enumerate(open_times):
             for block in [0, 1, 2, 3]:
-                if curr_duration >= task.duration:
+                if curr_duration >= duration:
                     return True, start_time
                 if block in hour:
                     if restart_time:
@@ -129,7 +147,14 @@ class Day:
                     restart_time = True
         return False, (0, 0)
 
-    def schedule_task(self, task, hour, block):
+    def time_plus(self, time, timedelta):
+        start = datetime.datetime(
+            2000, 1, 1,
+            hour=time.hour, minute=time.minute, second=time.second)
+        end = start + timedelta
+        return end.time()
+
+    def schedule_task(self, task, hour, block, duration):
         '''
         Insert given task into schedule starting at designated hour and block.
 
@@ -140,8 +165,11 @@ class Day:
 
         Output: void
         '''
+        date = self.date
+        start_time = datetime.time(hour, block * BLOCK_LENGTH, 0)
+        end_time = self.time_plus(start_time, datetime.timedelta(minutes = duration))
         minutes_per_block = MINUTES_PER_HOUR / BLOCKS_PER_HOUR
-        for i in range(int(task.duration // minutes_per_block)):
+        for i in range(int(duration // minutes_per_block)):
             self.times[hour][block] = task.name
             if block >= BLOCKS_PER_HOUR - 1:
                 hour += 1
@@ -149,8 +177,10 @@ class Day:
             else:
                 block += 1
 
+        return Event(task.name, task.priority, task.difficulty, start_time, end_time)
+
 class Task:
-    def __init__(self, name, priority, duration, difficulty=0, start_date = None, due_date=None):
+    def __init__(self, name, priority, duration, difficulty=0, start_date=None, due_date=None):
         '''
         Initializes a Task object
 
@@ -178,8 +208,8 @@ class Event:
         * name (str): name of task
         * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
         * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
-        * start_time (datetime obj): start date of task
-        * end_time (datetime obj): last day on which task can be completed
+        * start_time (time obj): start time of event
+        * end_time (time obj): end time of event
         '''
         self.name = name
         self.priority = priority
