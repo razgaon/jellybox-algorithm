@@ -26,7 +26,7 @@ class Schedule:
         * end_date (datetime obj): the ending date for the schedule
        
         Output:
-        * days (dict): empty 
+        * days (dict): empty schedule with Day objects
         '''
         delta = datetime.timedelta(days = 1)
         days = {}
@@ -36,6 +36,12 @@ class Schedule:
         return days
 
     def add_task(self, task):
+        '''
+        Add a task into the schedule
+        
+        Input:
+        * task (Task obj): task information
+        '''
         self.tasks.append(task)
         for day, day_schedule in self.days.items():
             if day < task.start_date:
@@ -50,6 +56,12 @@ class Schedule:
                 return
     
     def account_sleep(self, energy_preferences):
+        '''
+        Block out time for sleep in the schedule
+        
+        Input:
+        * energy_preferences (list): energy preferences (0 - least to 5 - most) for every hour in the day
+        '''
         task = Task('sleep', 5, 60)
         for time, block_energy in enumerate(energy_preferences):
             if block_energy == 0:
@@ -57,6 +69,9 @@ class Schedule:
                     day_schedule.schedule_task(task, time, 0)
 
     def display_schedule(self):
+        '''
+        Display the schedule as a 2D list
+        '''
         for day, day_schedule in self.days.items():
             print(day_schedule.times)
 
