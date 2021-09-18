@@ -1,8 +1,9 @@
+from preferences import *
+
 HOURS_PER_DAY = 24
 MINUTES_PER_HOUR = 60
 BLOCKS_PER_HOUR = 4
 
-import datetime
 class Schedule:
     def __init__(self, start_date, end_date):
         self.days = self.generate_blank_schedule(start_date, end_date)
@@ -27,6 +28,13 @@ class Schedule:
                 hour, block = start_time
                 day_schedule.schedule_task(task, hour, block)
                 return
+    
+    def account_sleep(self, energy_preferences):
+        task = Task(5, 1)
+        for time, block_energy in enumerate(energy_preferences):
+            if block_energy == 0:
+                for day_schedule in self.days.values():
+                    day_schedule.schedule_task(task, time, 0)
 
     def display_schedule(self):
         for day, day_schedule in self.days.items():
@@ -75,13 +83,12 @@ class Day:
                 block += 1
 
 class Task:
-    def __init__(self, priority, difficulty, start_date, due_date, duration):
+    def __init__(self, priority, duration, difficulty=0, start_date=None, due_date=None):
         self.priority = priority
         self.difficulty = difficulty
         self.start_date = start_date
         self.due_date = due_date
         self.duration = duration
-
 
 def add_task_to_schedule(task, schedule):
     pass
@@ -90,6 +97,6 @@ def add_task_to_schedule(task, schedule):
 start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2020, 1, 4)
 test_schedule = Schedule(start_date, end_date)
-test_task = Task(1, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3), 75)
+test_task = Task(1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
 test_schedule.add_task(test_task)
 test_schedule.display_schedule()
