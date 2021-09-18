@@ -24,6 +24,13 @@ class Schedule:
         self.preferences = Preferences(preferences[0]['energy_levels'], preferences[0]['sleep_start'], preferences[0]['sleep_end'])
         self.events = events #deepcopy
         self.tasks = tasks #deepcopy
+        self.initialize_tasks()
+
+    def initialize_tasks(self):
+        for task in self.tasks:
+            print(task)
+            task_obj = Task(task["name"], task["chunks"], task["priority"], task["duration"], task["difficulty"], task["start_date"], task["end_date"])
+            self.add_task(task_obj)
 
     def generate_blank_schedule(self, start_date, end_date):
         '''
