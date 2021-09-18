@@ -157,12 +157,13 @@ class Day:
                 block += 1
 
 class Task:
-    def __init__(self, name, priority, duration, difficulty=0, start_date = None, due_date=None):
+    def __init__(self, name, chunks, priority, duration, difficulty=0, start_date = None, due_date=None):
         '''
         Initializes a Task object
 
         Inputs:
         * name (str): name of task
+        * chunks (boolean): can it be divided into chunks of time
         * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
         * duration (int): estimated time to complete task in minutes
         * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
@@ -170,6 +171,7 @@ class Task:
         * due_date (datetime obj): last day on which task can be completed
         '''
         self.name = name
+        self.chunks = chunks
         self.priority = priority
         self.difficulty = difficulty
         self.start_date = start_date
@@ -210,7 +212,16 @@ events = [
     }
 ]
 
-tasks = []
+tasks = [
+    {
+        'name' : "pset", 
+        'priority' : 1, 
+        'difficulty' : 3, 
+        'date': datetime.date(2020, 1, 4),
+        'start_date' : datetime.date(2020, 1, 4), 
+        'end_date' : datetime.time(7,30,0)
+    }
+]
 start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2020, 1, 4)
 test_schedule = Schedule(start_date, end_date)
