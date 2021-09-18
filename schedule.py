@@ -32,7 +32,7 @@ class Schedule:
                 return
     
     def account_sleep(self, energy_preferences):
-        task = Task(5, 1)
+        task = Task('sleep', 5, 60)
         for time, block_energy in enumerate(energy_preferences):
             if block_energy == 0:
                 for day_schedule in self.days.values():
@@ -92,9 +92,14 @@ class Task:
         self.due_date = due_date
         self.duration = duration
 
+sleep_start = datetime.time(0,0,0)
+sleep_end = datetime.time(7,30,0)
+pref = Preferences([3,3,3,3,3,3], sleep_start, sleep_end)
+
 start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2020, 1, 4)
 test_schedule = Schedule(start_date, end_date)
 test_task = Task('testing', 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
 test_schedule.add_task(test_task)
+test_schedule.account_sleep(pref.get_energy_pref())
 test_schedule.display_schedule()
