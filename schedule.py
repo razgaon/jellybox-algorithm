@@ -19,7 +19,7 @@ class Schedule:
         self.days = self.generate_blank_schedule(schedule_start_date, schedule_end_date)
         self.sleep_start = preferences['sleep_start']
         self.sleep_end = preferences['sleep_end']
-        self.preferences = Preferences([preferences['early_morning'], preferences['late_morning'], preferences['afternoon'], preferences['early_evening'], preferences['late_evening'], preferences['night']], preferences['sleep_start'], preferences['sleep_end'])
+        self.preferences = Preferences(preferences[0]['energy_levels'], preferences[0]['sleep_start'], preferences[0]['sleep_end'])
         self.events = events #deepcopy
         self.tasks = tasks #deepcopy
 
@@ -202,16 +202,11 @@ class Event:
         self.start_time = start_time
         self.end_time = end_time
 
-preferences = {
-    'early_morning' : 3,
-    'late_morning': 3,
-    'afternoon': 3, 
-    'early_evening': 3,
-    'late_evening': 3,
-    'night' : 3,
+preferences = [{
+    'energy_levels' : [3,3,3,3,3,3],
     'sleep_start': datetime.time(0,0,0),
     'sleep_end': datetime.time(7,30,0),
-}
+}]
 
 events = [
     {
