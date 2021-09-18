@@ -6,7 +6,7 @@ BLOCKS_PER_HOUR = 4
 
 class Schedule:
 
-    def __init__(self, schedule_start_date, schedule_end_date):
+    def __init__(self, schedule_start_date, schedule_end_date, events = [], tasks = []):
         '''
         Initialize a Schedule object
         
@@ -15,7 +15,8 @@ class Schedule:
         * end_date (datetime obj): the ending date for the schedule
         '''
         self.days = self.generate_blank_schedule(schedule_start_date, schedule_end_date)
-        self.tasks = []
+        self.events = events #deepcopy
+        self.tasks = tasks #deepcopy
 
     def generate_blank_schedule(self, start_date, end_date):
         '''
@@ -34,7 +35,26 @@ class Schedule:
             days[start_date] = Day()
             start_date += delta
         return days
+    
+    def account_sleep(self, energy_preferences):
+        '''
+        Block out time for sleep in the schedule
+        
+        Input:
+        * energy_preferences (list): energy preferences (0 - least to 5 - most) for every hour in the day
+        '''
+        task = Task('sleep', 6, 60)
+        for time, block_energy in enumerate(energy_preferences):
+            if block_energy == 0:
+                for day_schedule in self.days.values():
+                    day_schedule.schedule_task(task, time, 0)
+    
+    def sort_events(self):
+        pass
 
+    #user adds task
+    #process it --> events
+    #events get added into schedule object
     def add_task(self, task):
         '''
         Add a task into the schedule
@@ -54,19 +74,6 @@ class Schedule:
                 hour, block = start_time
                 day_schedule.schedule_task(task, hour, block)
                 return
-    
-    def account_sleep(self, energy_preferences):
-        '''
-        Block out time for sleep in the schedule
-        
-        Input:
-        * energy_preferences (list): energy preferences (0 - least to 5 - most) for every hour in the day
-        '''
-        task = Task('sleep', 5, 60)
-        for time, block_energy in enumerate(energy_preferences):
-            if block_energy == 0:
-                for day_schedule in self.days.values():
-                    day_schedule.schedule_task(task, time, 0)
 
     def display_schedule(self):
         '''
@@ -170,7 +177,7 @@ class Task:
         self.duration = duration
 
 class Event:
-    def __init__(self, name, priority, difficulty=0, start_time=None, end_time=None):
+    def __init__(self, name, priority, difficulty=0, date=None, start_time=None, end_time=None):
         '''
         Initializes a Event object
 
@@ -178,19 +185,32 @@ class Event:
         * name (str): name of task
         * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
         * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
-        * start_time (datetime obj): start date of task
-        * end_time (datetime obj): last day on which task can be completed
+        * date (datetime obj): the date it will be completed on
+        * start_time (datetime obj): start time of task
+        * end_time (datetime obj): end time
         '''
         self.name = name
         self.priority = priority
         self.difficulty = difficulty
+        self.date = date
         self.start_time = start_time
         self.end_time = end_time
 
 sleep_start = datetime.time(0,0,0)
 sleep_end = datetime.time(7,30,0)
 pref = Preferences([3,3,3,3,3,3], sleep_start, sleep_end)
+events = [
+    {
+        'name' : "pset", 
+        'priority' : 1, 
+        'difficulty' : 3, 
+        'date': datetime.date(2020, 1, 4),
+        'start_time' : datetime.time(0,0,0), 
+        'end_time' : datetime.time(7,30,0)
+    }
+]
 
+tasks = []
 start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2020, 1, 4)
 test_schedule = Schedule(start_date, end_date)
