@@ -83,8 +83,8 @@ class Schedule:
         events = []
         for event in self.events:
             num = .6 * event.priority + .4 * event.difficulty
-            tasks.append((event, num))
-        event.sort(key=lambda x:x[1])
+            events.append((event, num))
+        events.sort(key=lambda x:x[1])
         
         self.events = []
         for event in events:
@@ -327,7 +327,6 @@ if __name__ == "__main__":
     start_date = datetime.date(2020, 1, 3)
     end_date = datetime.date(2020, 1, 7)
     test_schedule = Schedule(start_date, end_date, preferences, events, tasks)
-    print('hi')
     test_schedule.account_sleep()
     test_task = Task('testing', True, 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
     test_schedule.add_task(test_task)
