@@ -6,6 +6,7 @@ import datetime
 class Schedule:
     def __init__(self, start_date, end_date):
         self.days = self.generate_blank_schedule(start_date, end_date)
+        self.tasks = []
 
     def generate_blank_schedule(self, start_date, end_date):
         delta = datetime.timedelta(days = 1)
@@ -16,6 +17,7 @@ class Schedule:
         return days
 
     def add_task(self, task):
+        self.tasks.append(task)
         for day, day_schedule in self.days.items():
             if day < task.start_date:
                 continue
@@ -66,8 +68,7 @@ class Day:
     def schedule_task(self, task, hour, block):
         minutes_per_block = MINUTES_PER_HOUR / BLOCKS_PER_HOUR
         for i in range(int(task.duration // minutes_per_block)):
-            print(hour, block)
-            self.times[hour][block] = task
+            self.times[hour][block] = task.name
             if block >= BLOCKS_PER_HOUR - 1:
                 hour += 1
                 block = 0
@@ -75,7 +76,8 @@ class Day:
                 block += 1
 
 class Task:
-    def __init__(self, priority, difficulty, start_date, due_date, duration):
+    def __init__(self, name, priority, difficulty, start_date, due_date, duration):
+        self.name = name
         self.priority = priority
         self.difficulty = difficulty
         self.start_date = start_date
@@ -83,13 +85,9 @@ class Task:
         self.duration = duration
 
 
-def add_task_to_schedule(task, schedule):
-    pass
-        
-
 start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2020, 1, 4)
 test_schedule = Schedule(start_date, end_date)
-test_task = Task(1, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3), 75)
+test_task = Task("testing", 1, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3), 75)
 test_schedule.add_task(test_task)
 test_schedule.display_schedule()
