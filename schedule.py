@@ -26,11 +26,7 @@ class Schedule:
         * end_date (datetime obj): the ending date for the schedule
         
         Output:
-<<<<<<< HEAD
         * days (dict): dictionary mapping datetime objects to Day objects 
-=======
-        * days (dict): empty schedule with Day objects
->>>>>>> 5e7e0b295a936de339fe8781ceacd225f0bbfcde
         '''
         delta = datetime.timedelta(days = 1)
         days = {}
