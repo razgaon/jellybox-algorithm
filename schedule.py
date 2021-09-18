@@ -6,15 +6,20 @@ BLOCKS_PER_HOUR = 4
 
 class Schedule:
 
-    def __init__(self, schedule_start_date, schedule_end_date, events = [], tasks = []):
+    def __init__(self, schedule_start_date, schedule_end_date, preferences, events = [], tasks = []):
         '''
         Initialize a Schedule object
         
         Inputs:
         * start_date (datetime obj): the starting date for the schedule
         * end_date (datetime obj): the ending date for the schedule
+        * preferences (dictionary): sleep and energy preferences
+        * eveent
         '''
         self.days = self.generate_blank_schedule(schedule_start_date, schedule_end_date)
+        self.sleep_start = preferences['sleep_start']
+        self.sleep_end = preferences['sleep_end']
+        self.preferences = Preferences([preferences['early_morning'], preferences['late_morning'], preferences['afternoon'], preferences['early_evening'], preferences['late_evening'], preferences['night']], preferences['sleep_start'], preferences['sleep_end'])
         self.events = events #deepcopy
         self.tasks = tasks #deepcopy
 
@@ -35,19 +40,18 @@ class Schedule:
             days[start_date] = Day()
             start_date += delta
         return days
-    
-    def account_sleep(self, energy_preferences):
-        '''
-        Block out time for sleep in the schedule
-        
-        Input:
-        * energy_preferences (list): energy preferences (0 - least to 5 - most) for every hour in the day
-        '''
-        task = Task('sleep', 6, 60)
-        for time, block_energy in enumerate(energy_preferences):
+    '''
+    def account_sleep(self):
+    '''
+    #Block out time for sleep in the schedule
+    '''
+        event = Event('sleep', 6, 0, None, self.sleep_start, self.sleep_end) ##fix to include date
+        for time, block_energy in enumerate(self.preferences.energy_preferences):
             if block_energy == 0:
                 for day_schedule in self.days.values():
-                    day_schedule.schedule_task(task, time, 0)
+                    day_schedule.schedule_task(event, time, 0)
+                    self.events.append(event)
+    '''
     
     def sort_events(self):
         pass
@@ -198,34 +202,54 @@ class Event:
         self.start_time = start_time
         self.end_time = end_time
 
-sleep_start = datetime.time(0,0,0)
-sleep_end = datetime.time(7,30,0)
-pref = Preferences([3,3,3,3,3,3], sleep_start, sleep_end)
+preferences = {
+    'early_morning' : 3,
+    'late_morning': 3,
+    'afternoon': 3, 
+    'early_evening': 3,
+    'late_evening': 3,
+    'night' : 3,
+    'sleep_start': datetime.time(0,0,0),
+    'sleep_end': datetime.time(7,30,0),
+}
+
 events = [
     {
         'name' : "pset", 
         'priority' : 1, 
         'difficulty' : 3, 
         'date': datetime.date(2020, 1, 4),
-        'start_time' : datetime.time(0,0,0), 
-        'end_time' : datetime.time(7,30,0)
+        'start_time' : datetime.time(8,0,0), 
+        'end_time' : datetime.time(11,0,0)
     }
 ]
 
 tasks = [
     {
         'name' : "pset", 
+        'chunks': False,
         'priority' : 1, 
         'difficulty' : 3, 
-        'date': datetime.date(2020, 1, 4),
+        'duration': 180,
         'start_date' : datetime.date(2020, 1, 4), 
-        'end_date' : datetime.time(7,30,0)
+        'end_date' : datetime.date(2020, 1, 6)
+    },
+    {
+        'name' : "hw", 
+        'chunks': True,
+        'priority' : 5, 
+        'difficulty' : 4, 
+        'duration': 180,
+        'start_date' : datetime.date(2020, 1, 4), 
+        'end_date' : datetime.date(2020, 1, 6)
     }
 ]
-start_date = datetime.date(2020, 1, 1)
-end_date = datetime.date(2020, 1, 4)
-test_schedule = Schedule(start_date, end_date)
-test_schedule.account_sleep(pref.get_energy_pref())
-test_task = Task('testing', 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
-test_schedule.add_task(test_task)
+
+start_date = datetime.date(2020, 1, 3)
+end_date = datetime.date(2020, 1, 7)
+test_schedule = Schedule(start_date, end_date, preferences, events, tasks)
+print('hi')
+#test_schedule.account_sleep()
+#test_task = Task('testing', 1, 75, 1, datetime.date(2020, 1, 2), datetime.date(2020, 1, 3))
+#test_schedule.add_task(test_task)
 test_schedule.display_schedule()
