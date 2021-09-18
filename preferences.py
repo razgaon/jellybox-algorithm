@@ -1,5 +1,6 @@
 import datetime 
 
+#time blocks for each hour in a day
 time_blocks = []
 for num in range(24):
     time_blocks.append((datetime.time(num,0,0), datetime.time(num,59,59))) 
@@ -7,6 +8,14 @@ for num in range(24):
 class Preferences:
 
     def __init__(self, energy_preferences, sleep_start, sleep_end):
+        '''
+        Initialize a Preferences object
+        
+        Inputs:
+        * energy_preferences (list): energy preferences for early morning, late morning, afternoon, early evening, late evening, and night
+        * sleep_start (datetime obj): the starting time for sleep
+        * sleep_end (datetime obj): the ending time for sleep
+        '''
         self.sleep_start = sleep_start
         self.end_start = sleep_end
 
@@ -25,6 +34,12 @@ class Preferences:
                 self.energy_preferences[i] = 0
 
     def get_energy_pref(self):
+        '''
+        Get a energy preferences
+        
+        Output:
+        * energy_preferences (list): energy preferences on an hourly basis for a day
+        '''
         return self.energy_preferences
 
 if __name__ == "__main__":
