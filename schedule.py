@@ -24,9 +24,13 @@ class Schedule:
         Input:
         * start_date (datetime obj): the starting date for the schedule
         * end_date (datetime obj): the ending date for the schedule
-       
+        
         Output:
+<<<<<<< HEAD
+        * days (dict): dictionary mapping datetime objects to Day objects 
+=======
         * days (dict): empty schedule with Day objects
+>>>>>>> 5e7e0b295a936de339fe8781ceacd225f0bbfcde
         '''
         delta = datetime.timedelta(days = 1)
         days = {}
@@ -77,9 +81,21 @@ class Schedule:
 
 class Day:
     def __init__(self):
+        '''
+        Initialize a Day object
+        '''
         self.times = [[None] * BLOCKS_PER_HOUR for _ in range(HOURS_PER_DAY)]
 
     def get_open_times(self):
+        '''
+        Get all available time blocks
+
+        Inputs: None
+
+        Output:
+        * open_times (list): a list of 24 sets, one for each hour, containing the timeblocks within that hour that are 
+        available; 0 = first fifteen minutes, 1 = second fifteen minutes, etc.
+        '''
         open_times = [set() for _ in range(HOURS_PER_DAY)]
         for i in range(HOURS_PER_DAY):
             for j in range(BLOCKS_PER_HOUR):
@@ -88,6 +104,17 @@ class Day:
         return open_times
 
     def find_time_for_task(self, task):
+        '''
+        Finds first time block in which task can be scheduled
+
+        Inputs: 
+        * task (Task obj): task that is to be scheduled
+
+        Output:
+        * boolean representing whether or not a time block in which task can be fit is available
+        * tuple in form (hour, block) denoting first hour and 15-minute block within that hour during which 
+        the task can be scheduled; defaults to (0, 0) if not possible
+        '''
         start_time = (0, 0)
         curr_duration = 0
         open_times = self.get_open_times()
@@ -107,6 +134,16 @@ class Day:
         return False, (0, 0)
 
     def schedule_task(self, task, hour, block):
+        '''
+        Insert given task into schedule starting at designated hour and block.
+
+        Inputs:
+        * task (Task obj): the task to be scheduled
+        * hour (int): the hour from 0 to 23 during which the task should be started
+        * block (int): the block (0, 1, 2, etc) during the hour in which the task should be started
+
+        Output: void
+        '''
         minutes_per_block = MINUTES_PER_HOUR / BLOCKS_PER_HOUR
         for i in range(int(task.duration // minutes_per_block)):
             self.times[hour][block] = task.name
@@ -118,6 +155,17 @@ class Day:
 
 class Task:
     def __init__(self, name, priority, duration, difficulty=0, start_date=None, due_date=None):
+        '''
+        Initializes a Task object
+
+        Inputs:
+        * name (str): name of task
+        * priority (int): number from 1 (lowest) to 5 (highest) indicating priority level of task
+        * duration (int): estimated time to complete task in minutes
+        * difficulty (int): number from 1 (lowest) to 5 (highest) indicating difficulty of task
+        * start_date (datetime obj): start date of task
+        * due_date (datetime obj): last day on which task can be completed
+        '''
         self.name = name
         self.priority = priority
         self.difficulty = difficulty
