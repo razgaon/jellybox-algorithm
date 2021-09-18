@@ -5,10 +5,22 @@ MINUTES_PER_HOUR = 60
 BLOCKS_PER_HOUR = 4
 
 class Schedule:
+
+    # Initialize a Schedule object
+    # Inputs:
+    # start_date (datetime obj): the starting date for the schedule
+    # end_date (datetime obj): the ending date for the schedule
     def __init__(self, start_date, end_date):
+        
         self.days = self.generate_blank_schedule(start_date, end_date)
         self.tasks = []
 
+    # Generate a blank schedule
+    # Input:
+    # start_date (datetime obj): the starting date for the schedule
+    # end_date (datetime obj): the ending date for the schedule
+    # Output:
+    # days (dict): 
     def generate_blank_schedule(self, start_date, end_date):
         delta = datetime.timedelta(days = 1)
         days = {}
