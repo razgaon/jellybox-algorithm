@@ -55,17 +55,28 @@ class Schedule:
     #                 day_schedule.schedule_event(event, time, 0)
     #                 self.events.append(event)
     
-    def sort_events(self):
-        pass
+    def sort_tasks(self):
+        '''
+        Sort tasks by formula
+        '''
+        tasks = []
+        for task in self.tasks:
+            num = .6 * task.priority + .4 * task.difficulty
+            tasks.append((task, num))
+        tasks.sort(key=lambda x:x[1])
+        
+        self.tasks = []
+        for task in tasks:
+            self.tasks.append(task[0])
 
-    def add_task(self, task, chunks = True):
+    def add_task(self, task, hasSorted = False):
         '''
         Add a task into the schedule
         
         Input:
         * task (Task obj): task information
         '''
-        block_size = MINUTES_PER_BLOCK if chunks else task.duration
+        block_size = MINUTES_PER_BLOCK if task.chunks else task.duration
         self.tasks.append(task)
         remaining_duration = task.duration
         for day, day_schedule in self.days.items():
@@ -89,6 +100,15 @@ class Schedule:
 
             if remaining_duration == 0:
                 return
+        
+        #not able to add
+        if hasSorted == False:
+            self.sort_tasks()
+            hasSorted = True
+            for task in self.tasks:
+                self.add_task(task, hasSorted)
+        else:
+            return 'cannot add task!'
     
     def account_sleep(self):
         '''
