@@ -23,8 +23,6 @@ class Schedule:
         self.sleep_end = preferences[0]['sleep_end']
         self.preferences = Preferences(preferences[0]['energy_levels'], preferences[0]['sleep_start'], preferences[0]['sleep_end'])
         self.events = []
-        self.account_sleep()
-        self.sort_tasks()
         self.tasks = []
         self.initialize_events(events)
         self.initialize_tasks(tasks)
@@ -34,9 +32,13 @@ class Schedule:
         for event in events:
             event_obj = Event(event["name"], event["priority"], event["difficulty"], event["date"], event["start_time"], event["end_time"])
             self.events.append(event_obj)
+        
+        for event in self.events:
+            self.days[event.date].schedule_event(event)
 
 
     def initialize_tasks(self, tasks):
+        self.sort_tasks()
         for task in tasks:
             task_obj = Task(task["name"], task["chunks"], task["priority"], task["duration"], task["difficulty"], task["start_date"], task["end_date"])
             self.add_task(task_obj) 
@@ -68,7 +70,7 @@ class Schedule:
     #     for time, block_energy in enumerate(self.preferences.energy_preferences):
     #         if block_energy == 0:
     #             for day_schedule in self.days.values():
-    #                 day_schedule.schedule_event(event, time, 0)
+    #                 day_schedule.schedule_task_to_event(event, time, 0)
     #                 self.events.append(event)
     
     def sort_tasks(self):
@@ -125,7 +127,7 @@ class Schedule:
                 if is_time_available:
                     remaining_duration -= curr_duration
                     hour, block = start_time
-                    event = day_schedule.schedule_event(task, hour, block, curr_duration)
+                    event = day_schedule.schedule_task_to_event(task, hour, block, curr_duration)
                     self.events.append(event)
 
             if remaining_duration == 0:
@@ -225,7 +227,7 @@ class Day:
         end = start + timedelta
         return end.time()
 
-    def schedule_event(self, task, hour, block, duration):
+    def schedule_task_to_event(self, task, hour, block, duration):
         '''
         Insert given task into schedule starting at designated hour and block.
 
@@ -250,6 +252,21 @@ class Day:
 
         return Event(task.name, task.priority, task.difficulty, date, start_time, end_time)
 
+    def schedule_event(self, event):        
+        t1 = datetime.timedelta(hours=event.start_time.hour, minutes=event.start_time.minute)
+        t2 = datetime.timedelta(hours=event.end_time.hour, minutes=event.end_time.minute)
+
+        duration = (t2 - t1).total_seconds() / 60
+        hour = event.start_time.hour
+        block = event.start_time.minute
+        minutes_per_block = MINUTES_PER_HOUR / BLOCKS_PER_HOUR
+        for i in range(int(duration // minutes_per_block)):
+            self.times[hour][block] = event.name
+            if block >= BLOCKS_PER_HOUR - 1:
+                hour += 1
+                block = 0
+            else:
+                block += 1
 class Task:
     def __init__(self, name, chunks = False, priority=1, duration=60, difficulty=0, start_date = None, due_date=None):
         '''
